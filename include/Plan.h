@@ -42,7 +42,7 @@ class Plan {
     private:
         int plan_id;
         const Settlement& settlement;
-        SelectionPolicy* selectionPolicy; //What happens if we change this to a reference?
+        SelectionPolicy* selectionPolicy;
         PlanStatus status;
         vector<Facility*> facilities;
         vector<Facility*> underConstruction;

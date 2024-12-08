@@ -34,12 +34,8 @@ class Simulation {
         SettlementType numStringToSettlementType(const string &num);
         int findCommand(const string& command);
         const vector<string> commands;
-        //const int getPlanCounter() const;
-        //const vector<BaseAction*>& getActionsLog() const;
-        //vector<Plan>& getPlansList();
         bool printPlanStatus(const int i);
         void printActionsLog();
-        //string actionStatusToStr(const ActionStatus& status) const;
         bool changePlanPolicy(const int planId, const string &newPolicy);
 
         Simulation(const Simulation& other); 
@@ -50,7 +46,7 @@ class Simulation {
 
     private:
         bool isRunning;
-        int planCounter; //For assigning unique plan IDs
+        int planCounter;
         vector<BaseAction*> actionsLog;
         vector<Plan> plans;
         vector<Settlement*> settlements;
