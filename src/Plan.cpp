@@ -69,14 +69,14 @@ const SelectionPolicy* Plan::getSelectionPolicy() const
     return selectionPolicy;
 }
 
-Plan::Plan(const Plan &other, const Settlement &thisSettlement)
+Plan::Plan(const Plan &other, const Settlement &thisSettlement, const vector<FacilityType>& thisFacilityOptions)
 : plan_id(other.plan_id)
 , settlement(thisSettlement)
 , selectionPolicy(other.selectionPolicy->clone())
 , status(other.status)
 , facilities()
 , underConstruction()
-, facilityOptions(other.facilityOptions)
+, facilityOptions(thisFacilityOptions)
 , life_quality_score(other.life_quality_score)
 , economy_score(other.economy_score)
 , environment_score(other.environment_score)
@@ -90,6 +90,11 @@ Plan::Plan(const Plan &other, const Settlement &thisSettlement)
     {
         underConstruction.push_back(new Facility(*other.underConstruction[i]));
     }    
+}
+
+const Settlement &Plan::getPlanSettlement() const
+{
+    return settlement;
 }
 
 Plan::Plan(const Plan &other)

@@ -34,12 +34,13 @@ class Simulation {
         SettlementType numStringToSettlementType(const string &num);
         int findCommand(const string& command);
         const vector<string> commands;
-        const int getPlanCounter() const;
+        //const int getPlanCounter() const;
         //const vector<BaseAction*>& getActionsLog() const;
         //vector<Plan>& getPlansList();
-        void printPlanStatus(const int i);
+        bool printPlanStatus(const int i);
         void printActionsLog();
-        string actionStatusToStr(const ActionStatus& status) const;
+        //string actionStatusToStr(const ActionStatus& status) const;
+        bool changePlanPolicy(const int planId, const string &newPolicy);
 
         Simulation(const Simulation& other); 
         Simulation(Simulation&& other) noexcept;

@@ -313,10 +313,10 @@ int Simulation::findCommand(const string &command)
     return -1; //COMMAND NOT FOUND
 }
 
-const int Simulation::getPlanCounter() const
-{
-    return planCounter;
-}
+// const int Simulation::getPlanCounter() const
+// {
+//     return planCounter;
+// }
 
 // const vector<BaseAction*>& Simulation::getActionsLog() const
 // {
@@ -328,30 +328,55 @@ const int Simulation::getPlanCounter() const
 //     return plans;
 //}
 
-void Simulation::printPlanStatus(const int i)
+bool Simulation::printPlanStatus(const int i)
 {
-    plans[i].printStatus();
+    if (0 <= i && i <= planCounter)
+    {
+        plans[i].printStatus();
+        return true;
+    }
+    return false;
 }
 
 void Simulation::printActionsLog()
 {
     for(size_t i = 0; i < actionsLog.size(); i++)
     {
-        std::cout << actionsLog[i]->toString() << " "
-                  << actionStatusToStr(actionsLog[i]->getStatus()) << std::endl;    
+        std::cout << actionsLog[i]->toString() << std::endl;    
     }
 }
 
-string Simulation::actionStatusToStr(const ActionStatus &status) const
+bool Simulation::changePlanPolicy(const int planId, const string &newPolicy)
 {
-    if (status == ActionStatus::COMPLETED)
-        return "COMPLETED";
+    SelectionPolicy *newPolicyPtr = nullptr;
+    if(newPolicy == "bal")
+        newPolicyPtr = new BalancedSelection(getPlan(planId).getlifeQualityScore(), getPlan(planId).getEconomyScore(), getPlan(planId).getEnvironmentScore());        
     
-    if (status == ActionStatus::ERROR)
-        return "ERROR";
+    newPolicyPtr = stringToSelectionPoliciy(newPolicy);
+    string prevPolicy = getPlan(planId).getSelectionPolicy()->toString();
     
-    return "UNKNOWN"; //NOT FOUND
+    if(0 <= planId && planId <= planCounter && typeid(*newPolicyPtr) != typeid( *(getPlan(planId).getSelectionPolicy()) )) 
+    {
+        getPlan(planId).setSelectionPolicy(newPolicyPtr);
+        std::cout << "PlanID: " << std::to_string(planId) << "\n"
+                  << "previousPolicy: " << prevPolicy << "\n"
+                  << "newPolicy: " << newPolicyPtr->toString() << std::endl;
+        return true;          
+    }
+    delete newPolicyPtr;
+    return false;
 }
+
+// string Simulation::actionStatusToStr(const ActionStatus &status) const
+// {
+//     if (status == ActionStatus::COMPLETED)
+//         return "COMPLETED";
+    
+//     if (status == ActionStatus::ERROR)
+//         return "ERROR";
+    
+//     return "UNKNOWN"; //NOT FOUND
+// }
 
 Simulation::Simulation(const Simulation &other)
 : commands(other.commands)
@@ -367,11 +392,6 @@ Simulation::Simulation(const Simulation &other)
         actionsLog.push_back(other.actionsLog[i]->clone());
     }
 
-    for(size_t i = 0; i < other.plans.size(); i++)
-    {
-        plans.emplace_back(other.plans[i]);
-    }
-
     for(size_t i = 0; i < other.settlements.size(); i++)
     {
         settlements.push_back(new Settlement(*other.settlements[i]));
@@ -380,7 +400,12 @@ Simulation::Simulation(const Simulation &other)
     for(size_t i = 0; i < other.facilitiesOptions.size(); i++)
     {
         facilitiesOptions.emplace_back(other.facilitiesOptions[i]);
-    }    
+    }
+
+    for(size_t i = 0; i < other.plans.size(); i++)
+        {
+        plans.emplace_back(other.plans[i], getSettlement(other.plans[i].getPlanSettlement().getName()), facilitiesOptions);
+        }   
 }
 
 Simulation::Simulation(Simulation &&other) noexcept
@@ -431,12 +456,6 @@ Simulation &Simulation::operator=(const Simulation &other)
             actionsLog.push_back(other.actionsLog[i]->clone());    
         }
 
-        plans.clear();
-        for(size_t i = 0; i < other.plans.size(); i++)
-        {
-        plans.emplace_back(other.plans[i]);
-        }
-
         for(size_t i = 0; i < settlements.size(); i++) 
         {
             delete settlements[i];
@@ -452,6 +471,12 @@ Simulation &Simulation::operator=(const Simulation &other)
         for(size_t i = 0; i < other.facilitiesOptions.size(); i++)
         {
             facilitiesOptions.emplace_back(other.facilitiesOptions[i]);
+        }
+
+        plans.clear();
+        for(size_t i = 0; i < other.plans.size(); i++)
+        {
+        plans.emplace_back(other.plans[i], getSettlement(other.plans[i].getPlanSettlement().getName()), facilitiesOptions);
         }
     }
     

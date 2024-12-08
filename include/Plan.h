@@ -30,7 +30,8 @@ class Plan {
         bool reachedConstructionLimit() const;
         const int getId() const;
         const SelectionPolicy* getSelectionPolicy() const;
-        Plan(const Plan& other, const Settlement& thisSettlement); //NOT FINISHED
+        Plan(const Plan &other, const Settlement &thisSettlement, const vector<FacilityType>& thisFacilityOptions); //NEW
+        const Settlement& getPlanSettlement() const;
 
         Plan(const Plan& other); 
         Plan(Plan&& other) noexcept;

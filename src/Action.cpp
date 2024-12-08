@@ -179,9 +179,8 @@ PrintPlanStatus::PrintPlanStatus(int planId)
 
 void PrintPlanStatus::act(Simulation &simulation)
 {
-    if (0 <= planId && planId <= simulation.getPlanCounter())
+    if (simulation.printPlanStatus(planId))
     {
-        simulation.printPlanStatus(planId);
         complete();
         return;
     }
@@ -209,20 +208,11 @@ ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
 
 void ChangePlanPolicy::act(Simulation &simulation)
 {
-    SelectionPolicy *newPolicyPtr = simulation.stringToSelectionPoliciy(newPolicy);
-    string prevPolicy = simulation.getPlan(planId).getSelectionPolicy()->toString();
-    
-    if(0 <= planId && planId <= simulation.getPlanCounter() && typeid(*newPolicyPtr) == typeid( *(simulation.getPlan(planId).getSelectionPolicy()) )) 
+    if(simulation.changePlanPolicy(planId, newPolicy))
     {
-       simulation.getPlan(planId).setSelectionPolicy(newPolicyPtr);
-       complete();
-       std::cout << "PlanID: " << std::to_string(planId) << "\n"
-                 << "previousPolicy: " << prevPolicy << "\n"
-                 << "newPolicy: " << newPolicyPtr->toString() << std::endl;
-
-       return;          
+        complete();
+        return;
     }
-    delete newPolicyPtr;
     error(getErrorMsg());
 }
 

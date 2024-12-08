@@ -75,9 +75,9 @@ const string Facility::toString() const {
     string statusStr;
 
     if(status == FacilityStatus::UNDER_CONSTRUCTIONS)
-        statusStr = "UNDER_CONSTRUCTIONS";
+        statusStr = "FacilityStatus: UNDER_CONSTRUCTIONS";
     else
-        statusStr = "OPERATIONAL";
+        statusStr = "FacilityStatus: OPERATIONAL";
     str += statusStr;  
     
     return str;
