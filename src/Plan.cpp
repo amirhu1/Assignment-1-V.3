@@ -31,7 +31,8 @@ void Plan::setSelectionPolicy(SelectionPolicy* selectionPolicy)
 
 void Plan::step()
 {
-    while(status == PlanStatus::AVALIABLE) {
+    while(status == PlanStatus::AVALIABLE) 
+    {
         Facility* newFacility = new Facility(selectionPolicy->selectFacility(facilityOptions), settlement.getName());
         addFacility(newFacility);
 
@@ -39,8 +40,10 @@ void Plan::step()
             status = PlanStatus::BUSY;
     }
 
-    for(size_t i = 0; i < underConstruction.size(); i++) {
-        if(underConstruction[i]->step() == FacilityStatus::OPERATIONAL) {
+    for(size_t i = 0; i < underConstruction.size(); i++) 
+    {
+        if(underConstruction[i]->step() == FacilityStatus::OPERATIONAL) 
+        {
             addFacility(underConstruction[i]);
             underConstruction.erase(underConstruction.begin() + i);
             i--;

@@ -15,7 +15,7 @@ enum class ActionStatus;
 
 class Simulation {
     public:
-        Simulation(const string &configFilePath); //CHEACK
+        Simulation(const string &configFilePath);
         void start();
         void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
         void addAction(BaseAction *action);
@@ -37,6 +37,7 @@ class Simulation {
         bool printPlanStatus(const int i);
         void printActionsLog();
         bool changePlanPolicy(const int planId, const string &newPolicy);
+        bool isInteger(const string& str);
 
         Simulation(const Simulation& other); 
         Simulation(Simulation&& other) noexcept;

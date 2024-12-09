@@ -1,8 +1,8 @@
-all: bin/main
+all: bin/simulation
 
-bin/main: bin/Auxiliary.o bin/main.o bin/Facility.o bin/Settlement.o bin/Action.o bin/Plan.o bin/SelectionPolicy.o bin/Simulation.o
+bin/simulation: bin/Auxiliary.o bin/main.o bin/Facility.o bin/Settlement.o bin/Action.o bin/Plan.o bin/SelectionPolicy.o bin/Simulation.o
 	@echo 'Linking'
-	g++ -o bin/main bin/Auxiliary.o bin/main.o bin/Facility.o bin/Settlement.o bin/Action.o bin/Plan.o bin/SelectionPolicy.o bin/Simulation.o
+	g++ -o bin/simulation bin/Auxiliary.o bin/main.o bin/Facility.o bin/Settlement.o bin/Action.o bin/Plan.o bin/SelectionPolicy.o bin/Simulation.o
 	
 bin/Auxiliary.o: src/Auxiliary.cpp
 	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Auxiliary.o src/Auxiliary.cpp

@@ -4,7 +4,7 @@
 #include "sstream"
 #include "fstream"
 
-Simulation::Simulation(const string &configFilePath) //CHECK
+Simulation::Simulation(const string &configFilePath) 
 : commands({"step", "plan", "settlement", "facility", "planStatus", "changePolicy", "log", "close", "backup", "restore"}) 
 , isRunning(false)
 , planCounter(0) 
@@ -21,46 +21,39 @@ Simulation::Simulation(const string &configFilePath) //CHECK
         return;
     }
     
-    // if (file.peek() == std::ifstream::traits_type::eof())  CHEACK CASE OF EMPTY FILE
-    // {
-    //     std::cerr << "Error: Config file is empty!" << std::endl;
-    //     file.close();
-    //     return;
-    // }
-    
     std::string lineN;
     while (getline(file, lineN))
     {
-
-        vector<string> con = Auxiliary::parseArguments(lineN);
-        if (con.size() == 0)
-        {
+        vector<string> config = Auxiliary::parseArguments(lineN);
+        if (config.empty()) 
             continue;
-            ;
-        }
-
-        if (con[0] == "settlement" && con.size() == 3)
+            
+        if (config[0] == "settlement" && config.size() == 3 && !isSettlementExists(config[0]) && isInteger(config[2]))
         {
-            string name1 = con[1];
-            string num = con[2];
-            settlements.push_back(new Settlement(name1, numStringToSettlementType(num)));
+            string name = config[1];
+            string num = config[2];
+            settlements.push_back(new Settlement(name, numStringToSettlementType(num)));
         }
-        else if (con[0] == "facility" && con.size() == 7)
+        else if (config[0] == "facility" && config.size() == 7 && isInteger(config[2]) && isInteger(config[3]) && isInteger(config[4]) && isInteger(config[5]) && isInteger(config[6]))
         {
-            string name1 = con[1];
-            string cat = con[2];
-            int price = stoi(con[3]);
-            int numLifeScore = stoi(con[4]);
-            int numEcoScore = stoi(con[5]);
-            int numEnvScore = stoi(con[6]);
-            addFacility(FacilityType(name1, numStringToCategory(cat), price, numLifeScore, numEcoScore, numEnvScore));
+            string name = config[1];
+            string category = config[2];
+            int price = stoi(config[3]);
+            int numLifeScore = stoi(config[4]);
+            int numEcoScore = stoi(config[5]);
+            int numEnvScore = stoi(config[6]);
+            addFacility(FacilityType(name, numStringToCategory(category), price, numLifeScore, numEcoScore, numEnvScore));
         }
-        else if (con[0] == "plan" && con.size() == 3)
+        else if (config[0] == "plan" && config.size() == 3 && isSettlementExists(config[1]))
         {
-            string name1 = con[1];
-            string policyString = con[2];
-            addPlan(getSettlement(name1), stringToSelectionPoliciy(policyString));
+            string name = config[1];
+            string policyString = config[2];
+            SelectionPolicy* policy = stringToSelectionPoliciy(policyString);
+            if(policy != nullptr)
+                addPlan(getSettlement(name), policy);
         }
+        else
+        ;
     }
 }
 
@@ -74,10 +67,13 @@ void Simulation::start()
     {
         std::getline(std::cin, command);
         vector<string> a = Auxiliary::parseArguments(command);
+        if(a.empty())
+            continue;    
+        
         string &actionToDo = a[0];
-
         switch (findCommand(actionToDo)) {
             case 0: // "SimulateStep"
+                if(a.size() == 2  && isInteger(a[1]))
                 {
                 int numOfSteps = std::stoi(a[1]);
                 SimulateStep *stepAction = new SimulateStep(numOfSteps);
@@ -87,6 +83,7 @@ void Simulation::start()
                 }
                 break;
             case 1: // "AddPlan"
+                if(a.size() == 3)
                 {
                 AddPlan *addPlanAction = new AddPlan(a[1], a[2]);
                 addPlanAction->setInputSyntax(command); 
@@ -95,6 +92,7 @@ void Simulation::start()
                 }
                 break;
             case 2: // "AddSettlement"
+                if(a.size() == 3 && (numStringToSettlementType(a[2]) != SettlementType::ERROR_INVAILD_INPUT))
                 {
                 SettlementType settlementType = numStringToSettlementType(a[2]);
                 AddSettlement *addSettlementAction = new AddSettlement(a[1], settlementType);
@@ -104,6 +102,7 @@ void Simulation::start()
                 }
                 break;
             case 3: // "AddFacility"
+                if(a.size() == 7 && isInteger(a[3]) && isInteger(a[4]) && isInteger(a[5]) && isInteger(a[6]) && (numStringToCategory(a[2]) != FacilityCategory::ERROR_INVAILD_INPUT))
                 {
                 FacilityCategory facilityCategory = numStringToCategory(a[2]);
                 int price = std::stoi(a[3]);
@@ -117,6 +116,7 @@ void Simulation::start()
                 }
                 break;
             case 4: // "PrintPlanStatus"
+                if(a.size() == 2 && isInteger(a[1]))
                 {
                 PrintPlanStatus *printPlanStatusAction = new PrintPlanStatus(std::stoi(a[1]));
                 printPlanStatusAction->setInputSyntax(command); 
@@ -125,6 +125,7 @@ void Simulation::start()
                 }
                 break;
             case 5: // "ChangePlanPolicy"
+                if(a.size() == 3 && isInteger(a[1]))
                 {
                 ChangePlanPolicy *changePlanPolicyAction = new ChangePlanPolicy(std::stoi(a[1]), a[2]);
                 changePlanPolicyAction->setInputSyntax(command); 
@@ -133,7 +134,8 @@ void Simulation::start()
                 }
                 break;
             case 6: // "PrintActionsLog"
-                {
+                if(a.size() == 1)
+                {  
                 PrintActionsLog *printActionsLogAction = new PrintActionsLog();
                 printActionsLogAction->setInputSyntax(command); 
                 printActionsLogAction->act(*this);
@@ -141,6 +143,7 @@ void Simulation::start()
                 }
                 break;
             case 7: // "Close"
+                if(a.size() == 1)
                 {
                 Close *CloseAction = new Close();
                 CloseAction->setInputSyntax(command); 
@@ -149,6 +152,7 @@ void Simulation::start()
                 }
                 break;
             case 8: // "BackupSimulation"
+                if(a.size() == 1)
                 {
                 BackupSimulation *backupSimulationAction = new BackupSimulation();
                 backupSimulationAction->setInputSyntax(command); 
@@ -157,6 +161,7 @@ void Simulation::start()
                 }
                 break;
             case 9: // "RestoreSimulation"
+                if(a.size() == 1)
                 {
                 RestoreSimulation *restoreSimulationAction = new RestoreSimulation();
                 restoreSimulationAction->setInputSyntax(command); 
@@ -228,8 +233,7 @@ Settlement &Simulation::getSettlement(const string &settlementName)
         }
     }
     
-    Settlement *invalidInput = nullptr; //INCASE OF INVALID INPUT, UB:Dereferencing a null pointer-PROGRAM WILL LIKELY CRASH
-    return *invalidInput; 
+    return *settlements[-1]; //INCASE OF INVALID INPUT
 }
 
 Plan &Simulation::getPlan(const int planID) 
@@ -237,8 +241,9 @@ Plan &Simulation::getPlan(const int planID)
     if (0 <= planID && planID <= planCounter)
         return plans[planID];
     
-    Plan *invalidInput = nullptr;
-    return *invalidInput; //INCASE OF INVAILD INPUT, UB:Dereferencing a null pointer-PROGRAM WILL LIKELY CRASH
+    // Plan *invalidInput = nullptr;
+    // return *invalidInput; //INCASE OF INVAILD INPUT, UB:Dereferencing a null pointer-PROGRAM WILL LIKELY CRASH
+    return plans[-1];
 }
 
 void Simulation::step()
@@ -256,7 +261,6 @@ void Simulation::close()
     {
         std::cout << plans[i].toString() << std::endl;
     }
-
 }
 
 void Simulation::open()
@@ -313,24 +317,9 @@ int Simulation::findCommand(const string &command)
     return -1; //COMMAND NOT FOUND
 }
 
-// const int Simulation::getPlanCounter() const
-// {
-//     return planCounter;
-// }
-
-// const vector<BaseAction*>& Simulation::getActionsLog() const
-// {
-//     return actionsLog;
-// }
-
-// vector<Plan> &Simulation::getPlansList() 
-// {
-//     return plans;
-//}
-
 bool Simulation::printPlanStatus(const int i)
 {
-    if (0 <= i && i <= planCounter)
+    if (0 <= i && i < planCounter)
     {
         plans[i].printStatus();
         return true;
@@ -348,14 +337,17 @@ void Simulation::printActionsLog()
 
 bool Simulation::changePlanPolicy(const int planId, const string &newPolicy)
 {
+    if(!(0 <= planId && planId < planCounter))
+        return false;
+    
     SelectionPolicy *newPolicyPtr = nullptr;
     if(newPolicy == "bal")
         newPolicyPtr = new BalancedSelection(getPlan(planId).getlifeQualityScore(), getPlan(planId).getEconomyScore(), getPlan(planId).getEnvironmentScore());        
-    
-    newPolicyPtr = stringToSelectionPoliciy(newPolicy);
+    else
+        newPolicyPtr = stringToSelectionPoliciy(newPolicy);
     string prevPolicy = getPlan(planId).getSelectionPolicy()->toString();
     
-    if(0 <= planId && planId <= planCounter && typeid(*newPolicyPtr) != typeid( *(getPlan(planId).getSelectionPolicy()) )) 
+    if(typeid(*newPolicyPtr) != typeid( *(getPlan(planId).getSelectionPolicy()) )) 
     {
         getPlan(planId).setSelectionPolicy(newPolicyPtr);
         std::cout << "PlanID: " << std::to_string(planId) << "\n"
@@ -366,17 +358,6 @@ bool Simulation::changePlanPolicy(const int planId, const string &newPolicy)
     delete newPolicyPtr;
     return false;
 }
-
-// string Simulation::actionStatusToStr(const ActionStatus &status) const
-// {
-//     if (status == ActionStatus::COMPLETED)
-//         return "COMPLETED";
-    
-//     if (status == ActionStatus::ERROR)
-//         return "ERROR";
-    
-//     return "UNKNOWN"; //NOT FOUND
-// }
 
 Simulation::Simulation(const Simulation &other)
 : commands(other.commands)
@@ -512,4 +493,16 @@ Simulation &Simulation::operator=(Simulation &&other) noexcept
         other.facilitiesOptions.clear();
     }
     return *this;    
+}
+
+bool Simulation::isInteger(const string& str) {
+    if(str.empty())
+        return false;
+        
+    for(size_t i = 0; i < str.size(); i++)
+    {
+        if(!isdigit(str[i]))
+            return false;
+    }
+    return true;
 }
