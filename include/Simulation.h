@@ -28,12 +28,11 @@ class Simulation {
         void close();
         void open();
         
-        //NEW
         SelectionPolicy* stringToSelectionPoliciy(const string &name);
         FacilityCategory numStringToCategory(const string &num);
         SettlementType numStringToSettlementType(const string &num);
-        int findCommand(const string& command);
-        const vector<string> commands;
+        int findCommand(const string& command);// Used in the start method to find the corresponding action. 
+        const vector<string> commands;          // Used in the start method to find the corresponding action.
         bool printPlanStatus(const int i);
         void printActionsLog();
         bool changePlanPolicy(const int planId, const string &newPolicy);

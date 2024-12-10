@@ -12,7 +12,6 @@ Simulation::Simulation(const string &configFilePath)
 , plans()
 , settlements()
 , facilitiesOptions()
-
 {
     std::ifstream file(configFilePath);
     if (!file.is_open())
@@ -52,8 +51,6 @@ Simulation::Simulation(const string &configFilePath)
             if(policy != nullptr)
                 addPlan(getSettlement(name), policy);
         }
-        else
-        ;
     }
 }
 
@@ -233,7 +230,7 @@ Settlement &Simulation::getSettlement(const string &settlementName)
         }
     }
     
-    return *settlements[-1]; //INCASE OF INVALID INPUT
+    return *settlements[-1]; // The return settlements[-1] line is unreachable due to prior checks, included only for completeness.
 }
 
 Plan &Simulation::getPlan(const int planID) 
@@ -241,9 +238,7 @@ Plan &Simulation::getPlan(const int planID)
     if (0 <= planID && planID <= planCounter)
         return plans[planID];
     
-    // Plan *invalidInput = nullptr;
-    // return *invalidInput; //INCASE OF INVAILD INPUT, UB:Dereferencing a null pointer-PROGRAM WILL LIKELY CRASH
-    return plans[-1];
+    return plans[-1]; // The return plans[-1] line is unreachable due to prior checks, included only for completeness.
 }
 
 void Simulation::step()
@@ -307,6 +302,7 @@ SettlementType Simulation::numStringToSettlementType(const string &num)
                 return SettlementType::ERROR_INVAILD_INPUT;; //INCASE OF INVAILD INPUT
 }
 
+//Will be used in start method to find the corresponding action
 int Simulation::findCommand(const string &command)
 {
     for(size_t i = 0; i < commands.size(); i++) {
@@ -337,25 +333,21 @@ void Simulation::printActionsLog()
 
 bool Simulation::changePlanPolicy(const int planId, const string &newPolicy)
 {
-    if(!(0 <= planId && planId < planCounter))
-        return false;
-    
-    SelectionPolicy *newPolicyPtr = nullptr;
-    if(newPolicy == "bal")
-        newPolicyPtr = new BalancedSelection(getPlan(planId).getlifeQualityScore(), getPlan(planId).getEconomyScore(), getPlan(planId).getEnvironmentScore());        
-    else
-        newPolicyPtr = stringToSelectionPoliciy(newPolicy);
-    string prevPolicy = getPlan(planId).getSelectionPolicy()->toString();
-    
-    if(typeid(*newPolicyPtr) != typeid( *(getPlan(planId).getSelectionPolicy()) )) 
+    if((0 <= planId && planId < planCounter) && (newPolicy != getPlan(planId).getSelectionPolicy()->toString()))
     {
+        string prevPolicy = getPlan(planId).getSelectionPolicy()->toString();
+        SelectionPolicy *newPolicyPtr = stringToSelectionPoliciy(newPolicy);
+        if(newPolicyPtr == nullptr)
+            return false;
+        
         getPlan(planId).setSelectionPolicy(newPolicyPtr);
+        
         std::cout << "PlanID: " << std::to_string(planId) << "\n"
-                  << "previousPolicy: " << prevPolicy << "\n"
-                  << "newPolicy: " << newPolicyPtr->toString() << std::endl;
+                << "previousPolicy: " << prevPolicy << "\n"
+                << "newPolicy: " << newPolicyPtr->toString() << std::endl;
+        
         return true;          
     }
-    delete newPolicyPtr;
     return false;
 }
 

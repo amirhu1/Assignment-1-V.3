@@ -1,8 +1,17 @@
 #include "Plan.h"
 
 Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy* selectionPolicy, const vector<FacilityType> &facilityOptions)
-    : plan_id(planId), settlement(settlement), selectionPolicy(selectionPolicy), status(PlanStatus::AVALIABLE), facilities(), underConstruction(), facilityOptions(facilityOptions),
-      life_quality_score(0), economy_score(0), environment_score(0) {}
+    : plan_id(planId)
+    , settlement(settlement)
+    , selectionPolicy(selectionPolicy)
+    , status(PlanStatus::AVALIABLE)
+    , facilities()
+    , underConstruction()
+    , facilityOptions(facilityOptions)
+    , life_quality_score(0)
+    , economy_score(0)
+    , environment_score(0) 
+{}
 
 const int Plan::getlifeQualityScore() const
 {
@@ -22,8 +31,18 @@ const int Plan::getEnvironmentScore() const
 void Plan::setSelectionPolicy(SelectionPolicy* selectionPolicy)
 {
     if (this->selectionPolicy != nullptr)  
-    {                                       
         delete this->selectionPolicy;         
+
+    if(typeid(*selectionPolicy) == typeid(BalancedSelection))
+    {
+        int newLifeScore = getlifeQualityScore(), newEcoScore = getEconomyScore(), newEnvScore = getEnvironmentScore();
+        for(size_t i = 0; i < underConstruction.size(); i++)
+        {
+            newLifeScore += underConstruction[i]->getLifeQualityScore();
+            newEcoScore += underConstruction[i]->getEconomyScore();
+            newEnvScore += underConstruction[i]->getEnvironmentScore();
+        }
+        static_cast<BalancedSelection*>(selectionPolicy)->setBalancedPolicyScores(newLifeScore, newEcoScore, newEnvScore);
     }
 
     this->selectionPolicy = selectionPolicy;
@@ -58,7 +77,8 @@ void Plan::step()
         status = PlanStatus::AVALIABLE;
 }
 
-bool Plan::reachedConstructionLimit() const {
+bool Plan::reachedConstructionLimit() const 
+{
     return static_cast<int>(underConstruction.size()) == static_cast<int>(settlement.getType()) + 1;   
 }
 
@@ -72,6 +92,7 @@ const SelectionPolicy* Plan::getSelectionPolicy() const
     return selectionPolicy;
 }
 
+// Used in the copy constructor and copy assignment operator of the Simulation class.
 Plan::Plan(const Plan &other, const Settlement &thisSettlement, const vector<FacilityType>& thisFacilityOptions)
 : plan_id(other.plan_id)
 , settlement(thisSettlement)

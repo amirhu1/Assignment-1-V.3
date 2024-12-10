@@ -4,9 +4,8 @@ extern Simulation* backup;
 BaseAction::BaseAction(const string errorMsg, const ActionStatus status)
     : inputSyntax() 
     , errorMsg(errorMsg)
-    , status(status)
-{
-}
+    , status(status) 
+    {}
 
 ActionStatus BaseAction::getStatus() const
 {
@@ -24,6 +23,7 @@ string BaseAction::actionStatusToStr(const ActionStatus& status) const
     return "UNKNOWN"; //NOT FOUND    
 }
 
+// Sets the inputSyntax member variable to the command entered by the user.
 void BaseAction::setInputSyntax(const string inputSyntax)
 {
     this->inputSyntax = inputSyntax;
@@ -47,9 +47,7 @@ const string &BaseAction::getErrorMsg() const
 
 //----------------------------------------------------------------------
 
-SimulateStep::SimulateStep(const int numOfSteps) : numOfSteps(numOfSteps) 
-{
-}
+SimulateStep::SimulateStep(const int numOfSteps) : numOfSteps(numOfSteps) {}
 
 void SimulateStep::act(Simulation &simulation)
 {
@@ -74,10 +72,9 @@ SimulateStep *SimulateStep::clone() const
 
 AddPlan::AddPlan(const string &settlementName, const string &selectionPolicy)
     : BaseAction("Cannot create this plan", ActionStatus::ERROR) 
-    ,settlementName(settlementName)
-    ,selectionPolicy(selectionPolicy) 
-{
-}
+    , settlementName(settlementName)
+    , selectionPolicy(selectionPolicy) 
+    {}
 
 void AddPlan::act(Simulation &simulation)
 {
@@ -144,8 +141,7 @@ AddFacility::AddFacility(const string &facilityName, const FacilityCategory faci
 , lifeQualityScore(lifeQualityScore)
 , economyScore(economyScore)
 , environmentScore(environmentScore)
-{
-}
+{}
 
 void AddFacility::act(Simulation &simulation)
 {
@@ -155,7 +151,6 @@ void AddFacility::act(Simulation &simulation)
         complete();
         return;
     }
-
     error(getErrorMsg());
 }
 
@@ -174,8 +169,7 @@ const string AddFacility::toString() const
 PrintPlanStatus::PrintPlanStatus(int planId)
 : BaseAction("Plan doesn't exist", ActionStatus::ERROR)
 , planId(planId)
-{
-}
+{}
 
 void PrintPlanStatus::act(Simulation &simulation)
 {
@@ -203,8 +197,7 @@ ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy)
 : BaseAction("Cannot change selection policy", ActionStatus::ERROR)
 , planId(planId)
 , newPolicy(newPolicy)
-{
-}
+{}
 
 void ChangePlanPolicy::act(Simulation &simulation)
 {
@@ -251,8 +244,7 @@ const string PrintActionsLog::toString() const
 //----------------------------------------------------------------------
 
 Close::Close()
-{
-}
+{}
 
 void Close::act(Simulation &simulation)
 {
@@ -273,8 +265,7 @@ const string Close::toString() const
 //----------------------------------------------------------------------
 
 BackupSimulation::BackupSimulation()
-{
-}
+{}
 
 void BackupSimulation::act(Simulation &simulation)
 {
@@ -300,8 +291,7 @@ const string BackupSimulation::toString() const
 
 RestoreSimulation::RestoreSimulation()
 : BaseAction("No backup available", ActionStatus::ERROR)
-{
-}
+{}
 
 void RestoreSimulation::act(Simulation &simulation)
 {

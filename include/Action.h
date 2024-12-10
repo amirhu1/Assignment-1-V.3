@@ -22,7 +22,6 @@ class BaseAction{
         virtual BaseAction* clone() const = 0;
         virtual ~BaseAction() = default;
         
-        //NEW
         string actionStatusToStr(const ActionStatus& status) const;
         void setInputSyntax(const string inputSyntax);
 
@@ -31,8 +30,7 @@ class BaseAction{
         void error(string errorMsg);
         const string &getErrorMsg() const;
         
-        //NEW
-        string inputSyntax = "";
+        string inputSyntax = ""; // Stores the command entered by the user for use in the toString method.
 
     private:
         string errorMsg = "";

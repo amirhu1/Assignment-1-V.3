@@ -26,11 +26,11 @@ class Plan {
         void addFacility(Facility* facility);
         const string toString() const;
         
-        //NEW
         bool reachedConstructionLimit() const;
         const int getId() const;
         const SelectionPolicy* getSelectionPolicy() const;
-        Plan(const Plan &other, const Settlement &thisSettlement, const vector<FacilityType>& thisFacilityOptions); //NEW
+        Plan(const Plan &other, const Settlement &thisSettlement, const vector<FacilityType>& thisFacilityOptions); // Used in the copy constructor and copy assignment operator of the Simulation class.
+
         const Settlement& getPlanSettlement() const;
 
         Plan(const Plan& other); 

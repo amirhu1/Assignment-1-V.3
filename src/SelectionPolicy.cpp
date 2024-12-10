@@ -78,8 +78,8 @@ const FacilityType& BalancedSelection::selectFacility(const vector<FacilityType>
     int a, b, c, max, min, currDist, minIndex;
     int prevDist = std::numeric_limits<int>::max();
     
-    for(size_t i = 0; i < facilitiesOptions.size(); i++) {
-        
+    for(size_t i = 0; i < facilitiesOptions.size(); i++) 
+    {
         a = LifeQualityScore + facilitiesOptions[i].getLifeQualityScore();
         b = EconomyScore + facilitiesOptions[i].getEconomyScore();
         c = EnvironmentScore + facilitiesOptions[i].getEnvironmentScore();
@@ -88,7 +88,8 @@ const FacilityType& BalancedSelection::selectFacility(const vector<FacilityType>
         min = std::min({a, b, c});
         currDist = max - min;
         
-        if(currDist < prevDist) {
+        if(currDist < prevDist) 
+        {
             prevDist = currDist;
             minIndex = i;       
         }
@@ -109,4 +110,12 @@ const string BalancedSelection::toString() const
 BalancedSelection *BalancedSelection::clone() const
 {
     return new BalancedSelection(*this);;
+}
+
+// Sets scores when switching to a balanced policy.
+void BalancedSelection::setBalancedPolicyScores(int newLifeScore, int newEcoScore, int newEnvScore)
+{
+    LifeQualityScore = newLifeScore;
+    EconomyScore = newEcoScore;
+    EnvironmentScore = newEnvScore;
 }
