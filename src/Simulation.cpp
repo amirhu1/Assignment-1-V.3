@@ -302,7 +302,7 @@ SettlementType Simulation::numStringToSettlementType(const string &num)
                 return SettlementType::ERROR_INVAILD_INPUT;; //INCASE OF INVAILD INPUT
 }
 
-//Will be used in start method to find the corresponding action
+// Used in the start method to find the corresponding action.
 int Simulation::findCommand(const string &command)
 {
     for(size_t i = 0; i < commands.size(); i++) {
@@ -376,13 +376,13 @@ Simulation::Simulation(const Simulation &other)
     }
 
     for(size_t i = 0; i < other.plans.size(); i++)
-        {
+    {
         plans.emplace_back(other.plans[i], getSettlement(other.plans[i].getPlanSettlement().getName()), facilitiesOptions);
-        }   
+    }   
 }
 
 Simulation::Simulation(Simulation &&other) noexcept
-: commands(other.commands)
+: commands(other.commands) // Copying because `commands` is const, and const members cannot be moved
 , isRunning(other.isRunning)
 , planCounter(other.planCounter)
 , actionsLog(std::move(other.actionsLog))
@@ -390,10 +390,8 @@ Simulation::Simulation(Simulation &&other) noexcept
 , settlements(std::move(other.settlements))
 , facilitiesOptions(std::move(other.facilitiesOptions))
 {
-    other.actionsLog.clear();
-    other.plans.clear();
-    other.settlements.clear();
-    other.facilitiesOptions.clear();
+    other.isRunning = false;
+    other.planCounter = 0;
 }
 
 Simulation::~Simulation()
@@ -452,7 +450,6 @@ Simulation &Simulation::operator=(const Simulation &other)
         plans.emplace_back(other.plans[i], getSettlement(other.plans[i].getPlanSettlement().getName()), facilitiesOptions);
         }
     }
-    
     return *this;
 }
 
@@ -466,11 +463,9 @@ Simulation &Simulation::operator=(Simulation &&other) noexcept
         }
         actionsLog.clear();    
         actionsLog = std::move(other.actionsLog);
-        other.actionsLog.clear();
 
         plans.clear();
         plans = std::move(other.plans);
-        other.plans.clear();
 
         for(size_t i = 0; i < settlements.size(); i++) 
         {
@@ -478,12 +473,12 @@ Simulation &Simulation::operator=(Simulation &&other) noexcept
         }
         settlements.clear();    
         settlements = std::move(other.settlements);
-        other.settlements.clear();
 
         facilitiesOptions.clear();
         facilitiesOptions = std::move(other.facilitiesOptions);
-        other.facilitiesOptions.clear();
     }
+    other.isRunning = false;
+    other.planCounter = 0;
     return *this;    
 }
 
